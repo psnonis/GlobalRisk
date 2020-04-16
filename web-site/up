@@ -1,0 +1,5 @@
+#!/bin/bash
+
+clear
+cd "${0%/*}"
+python app.py

@@ -1,0 +1,1 @@
+conda create -y -n risk -c conda-forge nodejs python=3.8 jupyterlab=1.2.7 jupyterlab-dash

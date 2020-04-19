@@ -12,8 +12,8 @@ import numpy                            as     np
 
 from   dash                             import Dash
 from   dash.dependencies                import State as S, Input as I, Output as O
-from   dash_html_components             import Div, P, B, Span, Label, Img, H1, H2, Hr, A, Img, Link
-from   dash_core_components             import Graph, Loading, Dropdown, DatePickerRange, RangeSlider
+from   dash_html_components             import Div, P, B, Span, Label, Img, H1, H2, Hr, A, Img, Link, Iframe
+from   dash_core_components             import Graph, Loading, Dropdown, DatePickerRange, RangeSlider, Markdown
 from   dash_bootstrap_components        import Container, Row, Col, Tooltip, Collapse, Modal, ModalHeader, ModalBody, ModalFooter, Navbar, NavbarBrand, NavbarToggler, Jumbotron, Card, CardBody, Alert, Button, DropdownMenu, DropdownMenuItem
 from   dash_bootstrap_components.themes import BOOTSTRAP, CYBORG, CERULEAN, DARKLY, FLATLY
 from   plotly.graph_objects             import Figure, Layout, Choropleth, Scatter, Sunburst, Bar, Table
@@ -346,7 +346,16 @@ def makeRoot_Contents() :
                                     B('Valuable insights through disparate data connections'),
                                     P('By connecting financial performance, global footprint, and national risk data for over 100 countries, the visualization helps you get a better sense of the political, economic and financial risks facing these organizations.'),
                                     Hr(),
-                                    B('Target Audience: Investors, Students, Corporate Legal and Researchers')
+                                    B('Target Audience:'),
+                                    P('Investors, Students, Corporate Legal and Researchers'),
+                                    Hr(),
+                                    B('Data Sources:'),
+                                    P('Yahoo Finance, PRS Global Risk Dataset, Orbis Global Footprint Dataset, and SAP Capital IQ M&A Dataset'),
+                                    Hr(),
+                                    B('Team:'),
+                                    P('Jay Venkata, Keith Wertsching, and Pri Nonis'),
+                                    Hr(),
+                                    Iframe(src='https://zoom.us/rec/play/vJYqcu-grzM3SIWW5ASDB_IqW9W9La6sgyke8qdYyx63VSZRYVCuMuYRMAI0fIKQL0LNUUuXXcgTFVo', width = 1106, height = 650)
                                 ]
                                 )
                             ),

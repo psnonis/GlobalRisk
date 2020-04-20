@@ -669,14 +669,13 @@ def makePlot_Stock(corp, ftype) :
 
     layout = \
     Layout(
-        title       = f'<b>M & A History and Relative Stock Market Performance of {corp}</b>',
-        xaxis       = dict(
-        ),
-        yaxis       = dict(
-        ),
+        title         = f'<b>M & A History and Relative Stock Market Performance of {corp}</b>',
+        yaxis_title   = f'<b>Cumulative Return<br>(Multiple of Starting Value)<b>',
+        xaxis_title   = '<b>Dates<b>',
+        yaxis_ticksuffix = 'x'
     )
 
-    return [upFigure(traces = [trace0, trace1, trace2, trace3], layout = layout, margin = (60,40,40,200))]
+    return [upFigure(traces = [trace0, trace1, trace2, trace3], layout = layout, margin = (60,40,60,200))]
 
 @dash.callback(
     [
@@ -695,6 +694,7 @@ def makePlot_Total(code) :
     name  = data['cnmap' ][code]             if code else 'Country'
 
     risks = data['risks']
+    risks = risks[risks.nick != 'Total']
     final = risks.date.max()
 
     latest_country = risks[risks.date.eq(final)&
@@ -755,9 +755,11 @@ def makePlot_Total(code) :
         yaxis_showline       = False,
         yaxis_showticklabels = True,
 
+        xaxis_title          = '<b>Relative Risk Exposure<b>',
         xaxis_zeroline       = False,
         xaxis_showline       = False,
         xaxis_showticklabels = True,
+
         barmode              = 'group',
     )
 
@@ -815,19 +817,11 @@ def makeWorldPlot(corp, area, foot) :
         geo_oceancolor              = 'rgb(51, 193, 255)',
         geo_bgcolor                 = 'rgb(255, 255, 255)',
 
-        margin      =
-        {
-            't' : 60,
-            'b' :  0,
-            'r' :  0,
-            'l' :  0
-        },
-
         paper_bgcolor               = BG_PAPER,
         plot_bgcolor                = BG_PLOT,
     )
 
-    return [upFigure(traces = [trace0], layout = layout)]
+    return [upFigure(traces = [trace0], layout = layout, margin = (60,0,0,0))]
 
 @dash.callback(
     [
@@ -845,22 +839,49 @@ def makeBurstPlot(code) :
     code   = code['points'].pop()['location'] if code else ''
     name   = data['cnmap' ][code]             if code else 'Country'
 
-    tempo  = data['rlast'][data['rlast'].code == code]
+    tempo  = data['rlast'][data['rlast'].code.eq(code)]
+
+    nick = tempo.nick.tolist()
+    root = tempo.root.tolist()
+    rate = tempo.rate.tolist()
+    rati = tempo.rati.tolist()
+    perc = tempo.perc.tolist()
+
+    parents = []
+    values  = []
+    labels  = []
+
+    for n in range(41):
+        print(nick[n], root[n], rate[n], perc[n])
+        if  nick[n] != 'Total' and rati[n] > 0:
+            parents += [root[n]] if root[n] != 'Total' else [None]
+            values  += [rati[n]]
+            labels  += [nick[n]]
 
     trace0 = \
     Sunburst(
-        labels       = tempo.nick,
-        parents      = tempo.root,
-        values       = tempo.rate,
+        labels       = labels,
+        parents      = parents,
+        values       = values,
         branchvalues = 'total',
-        # marker       = dict(
-        #     colorscale = 'rdbu'
-        # )
     )
 
     layout = \
     Layout(
         title       = f'<b>Current Risk Breakdown in {name}</b>',
+        xaxis_title = f'<b>Unit Risk Exposure <a href="https://docs.google.com/spreadsheets/d/1HSR3GIjPgz6KsU2DWNKDiuk5BxqXx1McbkTSyv3ZVNo">Details</a></b>',
+        annotations = [
+                dict(
+                    x         = 2,
+                    y         = 5,
+                    xref      = "x",
+                    yref      = "y",
+                    text      = "",
+                    showarrow = False,
+                    arrowhead = 0,
+                    ax        = 0,
+                    ay        = -40
+                )]
     )
 
     return [upFigure(traces = [trace0], layout = layout, margin = (60,0,10,10))]
@@ -921,34 +942,36 @@ def makeTrendPlot(code, root) :
 
         traces.append(t)
 
-    # river  = pd.read_csv('data/river.csv')
-    # traces = []
+    river   = pd.read_csv('data/river.csv')
+    traces_ = []
 
-    # for n, c in enumerate(color) :
-    #     x = river[f'x'    ]
-    #     y = river[f'y_{n}']
+    for n, c in enumerate(color) :
+        x = river[f'x'    ]
+        y = river[f'y_{n}']
 
-    #     t = \
-    #     {
-    #         'fill' : 'tonexty',
-    #         'line' :
-    #         {
-    #         #   'color' : c,
-    #             'width' : 0,
-    #             'shape' : 'spline',
-    #         },
-    #         'mode'      : 'lines',
-    #         'type'      : 'scatter',
-    #       # 'fillcolor' : c,
-    #         'x'         : x,
-    #         'y'         : y,
-    #     }
+        t = \
+        {
+            'fill' : 'tonexty',
+            'line' :
+            {
+            #   'color' : c,
+                'width' : 0,
+                'shape' : 'spline',
+            },
+            'mode'      : 'lines',
+            'type'      : 'scatter',
+          # 'fillcolor' : c,
+            'x'         : x,
+            'y'         : y,
+        }
 
-    #     traces_.append(t)
+        traces_.append(t)
 
     layout = \
     Layout(
         title         = f'<b>Historical Stream of {root} Risk in {name}<b>',
+        yaxis_title   = '<b>Relative Risk Exposure<b>',
+        xaxis_title   = '<b>Dates<b>',
     )
 
     return [upFigure(traces = traces, layout = layout, margin = (60,40,40,200))]
